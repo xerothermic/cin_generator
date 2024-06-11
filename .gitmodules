@@ -1,0 +1,3 @@
+[submodule "ChhoeTaigiDatabase"]
+	path = ChhoeTaigiDatabase
+	url = git@github.com:ChhoeTaigi/ChhoeTaigiDatabase.git
