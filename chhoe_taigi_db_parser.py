@@ -17,6 +17,7 @@ class ChhoeTaigiDBParser:
         self._parse_single_word_v2()
         self._parse_single_word_from_phrase()
         self._parse_simple_phrase()
+        self._parse_alternative_phrase()
         return self
 
     def __str__(self):
@@ -72,3 +73,21 @@ class ChhoeTaigiDBParser:
             kip_input = row["KipInput"].replace("-", "").lower()
             self._cin_map[kip_input].add(row["KipUnicode"])
             self._cin_map[kip_input].add(row["HanLoTaibunKip"])
+
+    def _parse_alternative_phrase(self):
+        """ parse 文|白|替|俗 """
+        alternative_phrase = self._taigi_df[self._taigi_df.KipInput.str.contains("(文|白|替|俗)")]
+        # Drop -- /
+        alternative_phrase = alternative_phrase[~alternative_phrase.KipInput.str.contains("--|/")]
+        for _idx, row in alternative_phrase.iterrows():
+            kip_input = row["KipInput"].split("(")[0].lower()
+            kip_utf8 = row["KipUnicode"].split("(")[0]
+            self._cin_map[kip_input].add(kip_utf8)
+            self._cin_map[kip_input].add(row["HanLoTaibunKip"])
+            # Add other input if available
+            if isinstance(row["KipInputOthers"], str):
+                if row["KipInputOthers"].count('-') or row["KipInputOthers"].count('/'):
+                    continue
+                kip_input_others = row["KipInputOthers"].split("(")[0].lower()
+                kip_utf8_others = row["KipUnicodeOthers"].split("(")[0].lower()
+                self._cin_map[kip_input_others].add(kip_utf8_others)
