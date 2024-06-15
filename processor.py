@@ -38,9 +38,25 @@ def print_footer():
 
 
 def main():
-    parser = ChhoeTaigiDBParser("ChhoeTaigiDatabase/ChhoeTaigiDatabase/ChhoeTaigi_KauiokpooTaigiSutian.csv")
+    parser1 = ChhoeTaigiDBParser("ChhoeTaigiDatabase/ChhoeTaigiDatabase/ChhoeTaigi_KauiokpooTaigiSutian.csv")
+    parser2 = ChhoeTaigiDBParser("ChhoeTaigiDatabase/ChhoeTaigiDatabase/ChhoeTaigi_iTaigiHoataiTuichiautian.csv")
+    parser3 = ChhoeTaigiDBParser("ChhoeTaigiDatabase/ChhoeTaigiDatabase/ChhoeTaigi_TaihoaSoanntengTuichiautian.csv")
+    parser4 = ChhoeTaigiDBParser("ChhoeTaigiDatabase/ChhoeTaigiDatabase/ChhoeTaigi_TaijitToaSutian.csv")
+    parser1.parse()
+    parser2.parse()
+    parser3.parse()
+    parser4.parse()
+
+    cin_map1 = parser1._cin_map
+    cin_map2 = parser2._cin_map
+    cin_map3 = parser3._cin_map
+    cin_map4 = parser4._cin_map
+    cin_map1.update(cin_map2)
+    cin_map1.update(cin_map3)
+    cin_map1.update(cin_map4)
     print_header()
-    print(parser.parse())
+    # print(parser.parse())
+    print(parser1.stringify(cin_map1))
     print_footer()
 
 
