@@ -18,6 +18,7 @@ class ChhoeTaigiDBParser:
         self._parse_single_word_from_phrase()
         self._parse_simple_phrase()
         self._parse_alternative_phrase()
+        self._add_no_tones()
         return self
 
     def __str__(self):
@@ -91,3 +92,14 @@ class ChhoeTaigiDBParser:
                 kip_input_others = row["KipInputOthers"].split("(")[0].lower()
                 kip_utf8_others = row["KipUnicodeOthers"].split("(")[0].lower()
                 self._cin_map[kip_input_others].add(kip_utf8_others)
+
+    def _add_no_tones(self):
+        no_tones_map = defaultdict(set)
+        no_digit_map = {ord(str(d)): None for d in (2,3,4,5,7,8)}
+        for k,v in self._cin_map.items():
+            k = k.translate(no_digit_map)
+            if k in no_tones_map:
+                no_tones_map[k].update(v)
+            else:
+                no_tones_map[k] = v
+        self._cin_map.update(no_tones_map)
