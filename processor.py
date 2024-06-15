@@ -1,7 +1,7 @@
 import logging
 import sys
 
-import pandas as pd
+import click
 
 from chhoe_taigi_db_parser import ChhoeTaigiDBParser
 
@@ -14,7 +14,7 @@ def print_header():
     print("%ename kip-tailo")
     print("%cname 教羅")
     print("%encoding UTF-8")
-    print("%selkey qwdfzxyzv")
+    print("%selkey qwdfzxyv")
     print_keyname()
     print("%chardef begin", end="")
 

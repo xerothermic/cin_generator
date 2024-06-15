@@ -9,8 +9,12 @@ class ChhoeTaigiDBParser:
     """ Convert ChhoeTaigiDatabase csv to .cin format """
     def __init__(self, dict_path):
         self._dict_path = dict_path
-        self._taigi_df = pd.read_csv(self._dict_path)
+        self._taigi_df = self._load_dictionary()
         self._cin_map = defaultdict(set)
+
+    def _load_dictionary(self) -> pd.DataFrame:
+        taigi_df = pd.read_csv(self._dict_path)
+        return taigi_df[~taigi_df.KipInput.astype(str).str.contains("nan")]
 
     def parse(self):
         """ parse KipInput and fill _cin_map """
@@ -23,8 +27,12 @@ class ChhoeTaigiDBParser:
 
     def __str__(self):
         """ convert _cin_map to string """
+        return ChhoeTaigiDBParser.stringify(self._cin_map)
+
+    @classmethod
+    def stringify(cls, cin_map: Dict[str, Set[str]]) -> str:
         buf = ['']
-        sorted_cin_map = dict(sorted(self._cin_map.items()))
+        sorted_cin_map = dict(sorted(cin_map.items()))
         for k, l in sorted_cin_map.items():
             for v in l:
                 # In OpenVanilla: type k will output v
@@ -34,7 +42,7 @@ class ChhoeTaigiDBParser:
     def _parse_single_word_v2(self):
         """ convert single word to unicode and hanlo """
         # Ignore KipInput with () / space and japanese
-        single_word_df = self._taigi_df[~self._taigi_df.KipInput.str.contains("\\(|/|-| |な")]
+        single_word_df = self._taigi_df[~self._taigi_df.KipInput.astype(str).str.contains("\\(|/|-| |な")]
         for _idx, row in single_word_df.iterrows():
             k = row["KipInput"].lower()
             self._cin_map[k].add(row["KipUnicode"].lower())
@@ -55,6 +63,8 @@ class ChhoeTaigiDBParser:
                 continue
             for k, v in zip(kip_input_list, kip_utf8_list):
                 self._cin_map[k.lower()].add(v.lower())
+            if isinstance(kip_hanlo_list, float):
+                continue
             if len(kip_input_list) != len(kip_hanlo_list):
                 logger.warning(f"{kip_input_list} != {kip_hanlo_list}")
                 continue
@@ -65,7 +75,7 @@ class ChhoeTaigiDBParser:
         """
         parse phrase with pattern <word>-<word> ..., so we can type longer phrase at a time
         """
-        # ignore / 
+        # ignore /
         single_phrase_df = self._taigi_df[
             (~self._taigi_df.KipInput.str.contains("/")) &
             self._taigi_df.KipInput.str.contains("^[a-zA-Z2345789]+(-[a-zA-Z2345789]+)+$")]
@@ -86,7 +96,7 @@ class ChhoeTaigiDBParser:
             self._cin_map[kip_input].add(kip_utf8)
             self._cin_map[kip_input].add(row["HanLoTaibunKip"])
             # Add other input if available
-            if isinstance(row["KipInputOthers"], str):
+            if "KipInputOthers" in row and isinstance(row["KipInputOthers"], str):
                 if row["KipInputOthers"].count('-') or row["KipInputOthers"].count('/'):
                     continue
                 kip_input_others = row["KipInputOthers"].split("(")[0].lower()
