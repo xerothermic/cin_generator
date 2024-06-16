@@ -1,5 +1,6 @@
 from collections import defaultdict
 import logging
+from typing import Dict, Set
 
 import pandas as pd
 
@@ -22,6 +23,7 @@ class ChhoeTaigiDBParser:
         self._parse_single_word_from_phrase()
         self._parse_simple_phrase()
         self._parse_alternative_phrase()
+        self._parse_khiunn_khau2_tsha_phrase()
         self._add_no_tones()
         return self
 
@@ -102,6 +104,17 @@ class ChhoeTaigiDBParser:
                 kip_input_others = row["KipInputOthers"].split("(")[0].lower()
                 kip_utf8_others = row["KipUnicodeOthers"].split("(")[0].lower()
                 self._cin_map[kip_input_others].add(kip_utf8_others)
+
+    def _parse_khiunn_khau2_tsha_phrase(self):
+        df = self._taigi_df[self._taigi_df.KipInput.str.contains("/")]
+        df2 = df[["KipInput","KipUnicode"]].map(lambda x: x.split("/"))
+        df2["HanLoTaibunKip"] = df["HanLoTaibunKip"]
+        # expand each / to two rows
+        df2 = df2.explode(["KipInput","KipUnicode"])
+        for _idx, row in df2.iterrows():
+            k = row["KipInput"].replace(" ", "").replace("-", "").lower()
+            self._cin_map[k].add(row["KipUnicode"])
+            self._cin_map[k].add(row["HanLoTaibunKip"])
 
     def _add_no_tones(self):
         no_tones_map = defaultdict(set)
