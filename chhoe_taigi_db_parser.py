@@ -27,6 +27,10 @@ class ChhoeTaigiDBParser:
         self._add_no_tones()
         return self
 
+    @property
+    def cin_map(self):
+        return self._cin_map
+
     def __str__(self):
         """ convert _cin_map to string """
         return ChhoeTaigiDBParser.stringify(self._cin_map)
