@@ -1,6 +1,1 @@
-This script convert ChhoeTaigiDatabase .csv to OpenVanilla .cin format
-
-pip install -r requirement.txt
-git submodule init
-git submodule update
-python3 processor.py > kip.cin
+This prject has been migrated to (word2cin)[https://github.com/xerothermic/word2cin] 
