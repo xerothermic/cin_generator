@@ -1,1 +1,1 @@
-This prject has been migrated to (word2cin)[https://github.com/xerothermic/word2cin] 
+This prject has been migrated to [word2cin](https://github.com/xerothermic/word2cin)
